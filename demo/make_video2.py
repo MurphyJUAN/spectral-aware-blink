@@ -24,11 +24,11 @@ INK, INK2, INK3, BG, GOLD = (238, 241, 247), (169, 177, 199), (111, 120, 149), (
 STOPS = [(91, 76, 240), (42, 120, 214), (31, 182, 214), (27, 175, 122), (230, 194, 41), (235, 104, 52), (201, 50, 63)]
 
 # ---- narration timeline ----
-SEG = ["Hi, I'm Yining Juan from team Jellybit, tackling Planet X and SPHEREx.",
-       "Planet hunters blink sky images to spot movers. But SPHEREx sees every star through a rainbow filter, so even steady stars flicker.",
-       "Spectral-Aware Blink learns each star's spectrum from NASA SPHEREx data, subtracts it, and blinks what's left.",
+SEG = ["Hi, I'm Yining Juan from team Jellybit.",
+       "SPHEREx sees every star through a rainbow filter, so even steady stars flicker when you blink its images.",
+       "Spectral-Aware Blink learns each star's spectrum, subtracts it, and blinks only what's left.",
        "Normal blinking fakes cold brown dwarfs, Planet X's best targets, by up to thirty-six percent. We cut it to three.",
-       "Tested on ten sky fields, it catches WISE 0855 moving."]
+       "Tested on ten fields, it catches WISE 0855 moving."]
 dur = [float(subprocess.run([FF.replace("ffmpeg", "ffprobe"), "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0",
                              os.path.join(VO, f"s{i+1}.mp3")], capture_output=True, text=True).stdout) for i in range(5)]
 starts, t = [], 0.15
@@ -118,14 +118,14 @@ def frame(t):
         ftext(im, (64, 250), "Hi, I'm Yining Juan.", B(70), INK, t, 0.5)
         ftext(im, (64, 345), "Team Jellybit", R(34), INK2, t, 1.1)
         ftext(im, (64, 405), "Challenge: Planet X and SPHEREx", B(30), GOLD, t, 2.6)
-    elif t < s2 + 3.9:  # rainbow filter: a constant star slides across the LVF and "flickers"
+    elif t < s2 + 3.6:  # rainbow filter: a constant star slides across the LVF and "flickers"
         tt = t - s2
         ftext(im, (64, 120), "Planet hunters blink images to spot movers…", B(40), INK, t, s2)
         ftext(im, (64, 180), "…but SPHEREx sees every star through a rainbow filter.", R(34), INK2, t, s2 + 1.4)
         bx0, bx1, by = 64, 1216, 360
         im.paste(lvf(bx1 - bx0, 26), (bx0, by))
         d.text((bx0, by + 36), "0.75 µm", font=M(15), fill=INK3); d.text((bx1, by + 36), "5.0 µm", font=M(15), fill=INK3, anchor="ra")
-        x = (tt / 3.9) % 1.0
+        x = (tt / 3.6) % 1.0
         sed = 0.55 + 0.45 * math.sin(6.5 * x + 0.8) * math.exp(-1.2 * x) + 0.25 * math.exp(-((x - 0.62) / 0.06) ** 2)
         r = 10 + 34 * max(sed, 0.08)
         cx, cy = bx0 + x * (bx1 - bx0), 500
@@ -138,8 +138,8 @@ def frame(t):
         d.line((cx, by + 28, cx, cy - r - 6), fill=c, width=2)
         d.text((64, 590), f"same constant star · brightness seen through this colour: {sed:4.2f}", font=M(18), fill=INK2)
     elif t < s3 - 0.1:  # real data: problem figure with slow zoom
-        tt = t - (s2 + 3.9)
-        ftext(im, (64, 60), "Real SPHEREx data: one steady star looks 2× variable", B(36), INK, t, s2 + 3.9)
+        tt = t - (s2 + 3.6)
+        ftext(im, (64, 60), "Real SPHEREx data: one steady star looks 2× variable", B(36), INK, t, s2 + 3.6)
         im = card(im, IMG["fig1"], (40, 130, 1240, 580), zoom=1.0 + 0.06 * tt, alpha=ease(tt / 0.4))
     elif t < s3 + 2.0:  # title
         ftext(im, (64, 210), "OUR PROJECT", M(17), INK2, t, s3)

@@ -7,7 +7,7 @@
 Spectral-Aware Blink
 
 ## High-Level Project Summary
-SPHEREx photographs the whole sky through a rainbow filter: every exposure sees a star in a different colour, so blinking SPHEREx images, the classic way to find Planet X candidates, brown dwarfs and variable stars, makes constant stars flicker. We built Spectral-Aware Blink, a pipeline and web tool that learns each source's spectrum from the other survey passes, subtracts it, and blinks only what is left: real motion and real variability. Using only public NASA SPHEREx images (258 exposures, 10 fields, ~5,100 light curves), we show that naive light curves flag 58% of constant stars as periodic (1% after correction), that the suggested detector stacks fake 7–13% variability that we can predict from metadata (r = 0.92), and that cold brown dwarfs, the objects Planet X hunters want most, are the ones colour-blind methods fake the most (26–36%). The coldest known brown dwarf, WISE 0855, appears as a moving dipole that flips sign over the year.
+Planet X hunters find moving objects by blinking sky images. NASA's SPHEREx sees every star through a rainbow filter, so in its images even constant stars flicker. Spectral-Aware Blink fixes this: it learns each star's spectrum from the other survey passes, subtracts it, and blinks only real change. Using public SPHEREx data (258 exposures, 10 sky fields, 5,100 light curves), we found three things that, to our knowledge, had not been quantified before. (1) Naive SPHEREx light curves make 58% of constant stars look periodic; ours, 1%. (2) This fake variability can be predicted from metadata alone (r = 0.92). (3) The key insight: the objects Planet X hunters want most, cold brown dwarfs, are exactly the ones colour-blind blinking fakes the most, up to 36%; we cut it to about 3%. Our free web tool lets anyone blink SPHEREx cleanly, and it catches WISE 0855, the coldest known brown dwarf, moving.
 
 ## Link to Project Demo
 https://murphyjuan.github.io/spectral-aware-blink/demo/Spectral-Aware-Blink-30s.mp4
@@ -18,6 +18,14 @@ https://github.com/MurphyJUAN/spectral-aware-blink
 *(Live tool: https://murphyjuan.github.io/spectral-aware-blink/web/ )*
 
 ## Detailed Project Description
+
+**Highlights**
+- **Key insight:** colour-blind blinking fakes cold brown dwarfs, the best Planet X targets, by up to 36%; our spectral model keeps them at the ~3% floor. The effect follows a simple "relative-colour law" that holds in all 10 fields we tested.
+- **A trap for every SPHEREx time-domain user:** 58% of constant stars look periodic in naive light curves (1% with ours), because the wavelength sweeps with time inside each survey pass.
+- **Predictable before looking at pixels:** the fake variability is predicted from survey metadata plus one colour per source (r = 0.92).
+- **Working tool + real detection:** a free web tool that blinks SPHEREx with the colour flicker removed, and WISE 0855 caught as a moving dipole that flips sign over the year.
+
+**Why it stands out.** Other approaches compare only same-colour images (losing data) or stack each detector (the challenge's suggestion), which we show fakes 7–13% variability. We checked 13 papers: SPHEREx's newest forward-modelling work (November 2026) lists moving and variable sources as unsolved, and the SPHEREx pipeline plans variability flags that our relative-colour law predicts will over-flag colour-peculiar sources. We validated everything with fake sources injected into real data at equal false-alarm rates, and we report our negative result honestly.
 
 **What it does.** Spectral-Aware Blink turns SPHEREx's rainbow-filtered images into a clean "blink" that shows only real change. SPHEREx observes the sky through a linear variable filter: each row of each detector sees a different wavelength, and the telescope steps along that filter between exposures to collect a 102-channel spectrum of everything. The side effect is that the same constant star is measured at a different colour in every exposure. Plotted against time it looks variable by a factor of two; plotted against wavelength it is a smooth spectrum. Our tool removes that colour effect so that citizen scientists, researchers and pipelines can trust what blinks.
 
