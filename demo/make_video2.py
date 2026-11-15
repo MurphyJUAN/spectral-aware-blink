@@ -27,13 +27,13 @@ STOPS = [(91, 76, 240), (42, 120, 214), (31, 182, 214), (27, 175, 122), (230, 19
 SEG = ["Hi, I'm Yining Juan from team Jellybit, tackling Planet X and SPHEREx.",
        "Planet hunters blink sky images to spot movers. But SPHEREx sees every star through a rainbow filter, so even steady stars flicker.",
        "Spectral-Aware Blink learns each star's spectrum from NASA SPHEREx data, subtracts it, and blinks what's left.",
-       "Fake variables drop from fifty-eight percent to one, and the coldest brown dwarf, WISE 0855, appears moving.",
-       "Next: spectrum-aware blink for the whole sky. Try it online."]
+       "Normal blinking fakes cold brown dwarfs, Planet X's best targets, by up to thirty-six percent. We cut it to three.",
+       "Tested on ten sky fields, it catches WISE 0855 moving."]
 dur = [float(subprocess.run([FF.replace("ffmpeg", "ffprobe"), "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0",
                              os.path.join(VO, f"s{i+1}.mp3")], capture_output=True, text=True).stdout) for i in range(5)]
-starts, t = [], 0.3
+starts, t = [], 0.15
 for d in dur:
-    starts.append(t); t += d + 0.2
+    starts.append(t); t += d + 0.1
 TOTAL = min(29.7, t + 0.1)
 print("segments", [round(s, 2) for s in starts], "total", TOTAL)
 
@@ -152,31 +152,25 @@ def frame(t):
         im = card(im, IMG[f"b{k}"], (40, 120, 1240, 560))
         d = ImageDraw.Draw(im)
         d.text((64, 572), f"BLINK  pass {k+1}/4", font=M(20), fill=GOLD)
-    elif t < s4 + 3.3:  # stats count-up
+    elif t < s5 - 0.05:  # KEY INSIGHT: brown dwarfs faked most
         tt = t - s4
-        ftext(im, (64, 90), "WHAT WE FOUND · 258 EXPOSURES · 10 FIELDS · 5,100 LIGHT CURVES", M(16), INK2, t, s4)
-        p = ease(tt / 1.4)
-        v1 = 58 - (58 - 1) * ease((tt - 1.0) / 1.2)
-        im.paste(lvf(6, 120), (64, 150))
-        ftext(im, (90, 140), f"{58 if tt < 1.0 else round(v1)}%", B(110), INK, t, s4 + 0.1, dy=0)
-        ftext(im, (92, 275), "constant stars falsely flagged as periodic (naive → ours)", R(26), INK2, t, s4 + 0.4)
-        ftext(im, (64, 360), "26–36% → ~3%", B(64), INK, t, s4 + 1.8)
-        ftext(im, (66, 440), "fake blinks predicted for cold brown dwarfs", R(26), INK2, t, s4 + 2.0)
-    elif t < s5 - 0.1:  # WISE 0855 moving
-        tt = t - (s4 + 3.3)
-        k = [0, 3, 0, 3][min(int(tt / 0.8), 3)]
-        ftext(im, (64, 56), "WISE 0855, the coldest known brown dwarf, moving", B(34), INK, t, s4 + 3.3)
-        im = card(im, IMG[f"b{k}"], (40, 120, 1240, 560), zoom=1.0 + 0.08 * tt)
-        ImageDraw.Draw(im).text((64, 572), f"pass {k+1}  ·  dipole flips as it moves 1.3 px/yr", font=M(20), fill=GOLD)
-    else:  # future
+        ftext(im, (64, 80), "THE KEY INSIGHT · 10 FIELDS · 5,100 LIGHT CURVES", M(16), INK2, t, s4)
+        ftext(im, (64, 115), "Cold brown dwarfs, Planet X's best targets,", B(40), INK, t, s4 + 0.1)
+        ftext(im, (64, 168), "are the ones normal blinking fakes the most.", B(40), INK, t, s4 + 0.5)
+        v = 36 - 33 * ease((tt - 3.6) / 1.4)
+        im.paste(lvf(6, 150), (64, 260))
+        ftext(im, (90, 250), "up to", R(30), INK2, t, s4 + 1.5, dy=0)
+        ftext(im, (90, 285), f"{round(v)}%", B(130), (255, 210, 138) if tt < 3.6 else INK, t, s4 + 1.5, dy=0)
+        ftext(im, (92, 440), "fake blink amplitude: normal blinking  →  Spectral-Aware Blink", R(26), INK2, t, s4 + 2.0)
+        ftext(im, (64, 500), "Also: 58% of constant stars look 'periodic' naively → 1% with ours", R(22), INK3, t, s4 + 4.2)
+    else:  # validation + WISE 0855 + call to action
         tt = t - s5
-        ftext(im, (64, 60), "Next: spectrum-aware blink for the whole sky", B(40), INK, t, s5)
-        im = card(im, IMG["tool"], (360, 125, 1240, 560), zoom=1.0 + 0.03 * tt, alpha=ease(tt / 0.4))
+        k = [0, 3, 0, 3, 0, 3][min(int(tt / 0.75), 5)]
+        ftext(im, (64, 50), "Tested on 10 sky fields: WISE 0855 caught moving", B(34), INK, t, s5)
+        im = card(im, IMG[f"b{k}"], (40, 105, 1240, 520), zoom=1.0 + 0.05 * tt)
         d = ImageDraw.Draw(im)
-        ftext(im, (64, 200), "Try it online", B(30), GOLD, t, s5 + 0.8)
-        ftext(im, (64, 245), "murphyjuan.github.io/", M(19), INK2, t, s5 + 1.0)
-        ftext(im, (64, 272), "spectral-aware-blink", M(19), INK2, t, s5 + 1.0)
-        ftext(im, (64, 330), "Jellybit · Yining Juan", R(22), INK2, t, s5 + 1.4)
+        d.text((64, 530), f"pass {k+1}: the dipole flips as the coldest known brown dwarf moves", font=M(19), fill=GOLD)
+        ftext(im, (64, 572), "Try it online: murphyjuan.github.io/spectral-aware-blink", M(22), INK, t, s5 + 1.0, dy=0)
     subtitle(im, t)
     return im
 

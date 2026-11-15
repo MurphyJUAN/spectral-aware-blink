@@ -11,7 +11,7 @@ SPHEREx photographs the whole sky through a rainbow filter: every exposure sees 
 
 ## Link to Project Demo
 https://murphyjuan.github.io/spectral-aware-blink/demo/Spectral-Aware-Blink-30s.mp4
-*(29.7-second narrated video with English subtitles, SI voice disclosed, plays in any browser. Alternative: 7-slide deck https://github.com/MurphyJUAN/spectral-aware-blink/blob/main/demo/Spectral-Aware-Blink-slides.pdf . Optionally upload the MP4 to YouTube and use that link.)*
+*(29-second narrated video with English subtitles, SI voice disclosed, plays in any browser. Alternative: 7-slide deck https://github.com/MurphyJUAN/spectral-aware-blink/blob/main/demo/Spectral-Aware-Blink-slides.pdf . Optionally upload the MP4 to YouTube and use that link.)*
 
 ## Link to Final Project
 https://github.com/MurphyJUAN/spectral-aware-blink
