@@ -154,17 +154,26 @@ function showStar(id) {
   const pts = [];
   s.f.forEach((f, i) => { if (f != null && s.l[i] != null) pts.push({f, e: s.e[i], l: s.l[i], t: D.mjd[i], d: D.det[i], p: D.pas[i]}); });
   const fits = {}, betaField = {1: 0.54, 2: 0.19, 3: -1.25, 4: -1.63, 5: -1.89, 6: -1.32};
-  for (let d = 1; d <= 6; d++) { const q = pts.filter(p => p.d === d); if (q.length >= 6) fits[d] = fitPL(q.map(p => p.l), q.map(p => p.f), q.map(p => p.e)); }
+  const skipped = [];
+  for (let d = 1; d <= 6; d++) {
+    const q = pts.filter(p => p.d === d); if (q.length < 6) continue;
+    const snrMed = median(q.map(p => p.f / p.e)), posFrac = q.filter(p => p.f > 0).length / q.length;
+    if (snrMed < 5 || posFrac < 0.9) { skipped.push(d); continue; }   // too faint for a log-space spectral fit
+    const ft = fitPL(q.map(p => p.l), q.map(p => p.f), q.map(p => p.e));
+    if (!isFinite(ft.b) || Math.abs(ft.b) > 10) { skipped.push(d); continue; }
+    fits[d] = ft;
+  }
   pts.forEach(p => { const ft = fits[p.d]; p.m = ft ? evalPL(ft, p.l) : NaN; });
   const C = PASSC();
   document.getElementById("leg").innerHTML = D.pass_dates.map((d, i) => `<span><i class="sw" style="background:${C[i]}"></i>pass ${i + 1}</span>`).join("") + `<span><i class="sw" style="background:var(--text-primary);border-radius:2px;height:3px"></i>smooth SED per detector (quadratic in ln λ)</span>`;
   document.getElementById("info").innerHTML = `<b>star #${s.id}</b> · RA ${s.ra}, Dec ${s.dec} · stack SNR ${s.snr} · ${pts.length} measurements`;
   plot("spec", pts, p => p.l, p => p.f, "wavelength at star [µm]", "flux", "Flux vs WAVELENGTH — smooth spectrum", true, fits);
   const med = {}; for (let d = 1; d <= 6; d++) { const q = pts.filter(p => p.d === d).map(p => p.f); if (q.length) med[d] = median(q); }
-  pts.forEach(p => { p.rel = p.f / med[p.d]; p.res = p.f / p.m; });
-  const sd = a => { const b = a.filter(isFinite), mu = b.reduce((x, y) => x + y, 0) / b.length; return Math.sqrt(b.reduce((x, y) => x + (y - mu) ** 2, 0) / b.length); };
-  plot("lc", pts, p => p.t - D.mjd[0], p => p.rel, "days since first exposure", "relative flux",
-       `Relative flux vs TIME — naive (dots, rms ${(100 * sd(pts.map(p => p.rel))).toFixed(1)}%) vs ÷ spectral model (rings, rms ${(100 * sd(pts.map(p => p.res))).toFixed(1)}%)`, false, null, p => p.res);
+  pts.forEach(p => { const ok = fits[p.d] && p.f > 0; p.rel = ok ? p.f / med[p.d] : NaN; p.res = ok ? p.f / p.m : NaN; });
+  const sd = a => { const b = a.filter(isFinite); if (b.length < 3) return NaN; const m = median(b); return 1.4826 * median(b.map(x => Math.abs(x - m))); };  // robust rms (MAD)
+  const lcPts = pts.filter(p => isFinite(p.rel));
+  plot("lc", lcPts.length ? lcPts : pts, p => p.t - D.mjd[0], p => p.rel, "days since first exposure", "relative flux",
+       `Relative flux vs TIME — naive (dots, robust rms ${(100 * sd(pts.map(p => p.rel))).toFixed(1)}%) vs ÷ spectral model (rings, rms ${(100 * sd(pts.map(p => p.res))).toFixed(1)}%)`, false, null, p => p.res);
   // R2/R3 warning: predicted lambda-blind false variability from metadata
   let rows = "";
   for (let d = 1; d <= 6; d++) {
@@ -179,7 +188,8 @@ function showStar(id) {
       const muk = qk.reduce((a, p) => a + Math.log(p.l), 0) / qk.length; worstRel = Math.max(worstRel, Math.abs((fits[d].b - betaField[d]) * (muk - mu))); }
     rows += `<tr><td>D${d}</td><td>${fits[d].b.toFixed(2)}</td><td>${(fits[d].b - betaField[d]).toFixed(2)}</td><td>${(100 * worst).toFixed(1)}%</td><td>${(100 * worstRel).toFixed(1)}%</td></tr>`;
   }
-  document.getElementById("warn").innerHTML = `<div class="warn"><b>Predicted false blink amplitude (from metadata, rules R2/R3)</b><br>
+  const skipNote = skipped.length ? `<br><span class="cap">Detectors ${skipped.map(d => "D" + d).join(", ")}: too faint for a reliable spectral fit (median S/N &lt; 5) — not shown.</span>` : "";
+  document.getElementById("warn").innerHTML = `<div class="warn"><b>Predicted false blink amplitude (from metadata, rules R2/R3)</b>${skipNote}<br>
   <table><tr><th>det</th><th>β</th><th>β−β_field</th><th>λ-blind stack</th><th>after zero-point</th></tr>${rows}</table>
   Values above ~3% exceed the spectral-model floor: compare passes only through the spectral residual for this star.</div>`;
 }
