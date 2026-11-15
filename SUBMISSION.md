@@ -10,8 +10,8 @@ Spectral-Aware Blink
 SPHEREx photographs the whole sky through a rainbow filter: every exposure sees a star in a different colour, so blinking SPHEREx images, the classic way to find Planet X candidates, brown dwarfs and variable stars, makes constant stars flicker. We built Spectral-Aware Blink, a pipeline and web tool that learns each source's spectrum from the other survey passes, subtracts it, and blinks only what is left: real motion and real variability. Using only public NASA SPHEREx images (258 exposures, 10 fields, ~5,100 light curves), we show that naive light curves flag 58% of constant stars as periodic (1% after correction), that the suggested detector stacks fake 7–13% variability that we can predict from metadata (r = 0.92), and that cold brown dwarfs, the objects Planet X hunters want most, are the ones colour-blind methods fake the most (26–36%). The coldest known brown dwarf, WISE 0855, appears as a moving dipole that flips sign over the year.
 
 ## Link to Project Demo
-https://github.com/MurphyJUAN/spectral-aware-blink/blob/main/demo/Spectral-Aware-Blink-slides.pdf
-*(7 slides incl. title. Alternative: upload the same PDF to Google Drive with "Anyone with the link" access.)*
+https://murphyjuan.github.io/spectral-aware-blink/demo/Spectral-Aware-Blink-30s.mp4
+*(29-second video, English on-screen text, plays in any browser. Alternative: 7-slide deck https://github.com/MurphyJUAN/spectral-aware-blink/blob/main/demo/Spectral-Aware-Blink-slides.pdf . Optionally upload the MP4 to YouTube and use that link.)*
 
 ## Link to Final Project
 https://github.com/MurphyJUAN/spectral-aware-blink
@@ -46,12 +46,40 @@ https://github.com/MurphyJUAN/spectral-aware-blink
 Yes. The core idea of this project (removing SPHEREx's rainbow-filter flicker by subtracting a spectral model learned from the other survey passes before blinking) was conceived by Yining Juan together with a discussion partner, without SI. We then used Claude (Anthropic) to expand our idea into a detailed implementation plan, and Claude Code, an SI coding assistant, to write and debug the Python pipeline and the web tool, run and analyse the experiments, search and summarise the literature, produce the figures programmatically, and draft the documentation, slides and submission text. We reviewed the results and decided which claims to make. Every source file carries an "SI-generated" header, and the data products and web pages are labelled the same way in their metadata. No SI image, video or audio generation was used: every figure is a plot made by our code from NASA data.
 
 ## NASA Data
-- **SPHEREx DR1 Level-2 spectral images** (NASA/IPAC Infrared Science Archive), read from the public AWS mirror `s3://nasa-irsa-spherex/dr1/level2/`: IMAGE, VARIANCE, ZODI (zodiacal-light model), FLAGS and WCS-WAVE (per-pixel wavelength) extensions of 258 exposures covering WISE 0855−0714 (May 2025 – May 2026). These are the core input of every result.
-- IRSA SPHEREx SIA image metadata for WISE 0855 (retrieved 2025-11-14) and IRSA SPHEREx documentation and tutorials.
-- NASA WISE/NEOWISE heritage: WiseView and Backyard Worlds as the blink paradigm we extend.
-- 2MASS (NASA/IPAC) photometry, used once to identify a blended star.
+- **SPHEREx DR1 Level-2 Spectral Images** (NASA / Caltech-IPAC IRSA), the core input of every result. We used the IMAGE, VARIANCE, ZODI (zodiacal-light model), FLAGS and WCS-WAVE (per-pixel wavelength) extensions of 258 exposures covering WISE 0855−0714 (May 2025 – May 2026), read by HTTP range requests from the public AWS mirror.
+  - IRSA SPHEREx mission page: https://irsa.ipac.caltech.edu/Missions/spherex.html
+  - Public AWS S3 mirror: https://nasa-irsa-spherex.s3.amazonaws.com/ (prefix `dr1/level2/`)
+- **IRSA SPHEREx Simple Image Access (SIA) service**, used to list the exposures covering WISE 0855 (results saved on 2025-11-14): https://irsa.ipac.caltech.edu/SIA?COLLECTION=spherex_dr1
+- **IRSA SPHEREx tutorials and documentation** (FITS structure, flag bits, wavelength WCS): https://caltech-ipac.github.io/irsa-tutorials/spherex/
+- **2MASS All-Sky Point Source Catalog** (NASA/IPAC), used to identify a blended star: https://irsa.ipac.caltech.edu/Missions/2mass.html (accessed through the VizieR mirror, catalog II/246)
+- **NASA WISE / NEOWISE heritage**, the blink approach we extend: WiseView https://byw.tools/wiseview and Backyard Worlds: Planet 9 https://backyardworlds.org/
 
 ## Space Agency Partner Data and Other References
-- Target coordinates and proper motions: SIMBAD (CDS, Strasbourg) via Sesame; ESA Gaia DR3 values as compiled in SIMBAD.
-- Literature: Bock et al. 2025, The SPHEREx Satellite Mission (arXiv:2511.02985); Akeson et al. 2025, SPHEREx pipeline (arXiv:2511.15823); Saydjari et al. 2026, Forward modeling LVF data (arXiv:2611.12846); Gagné et al. 2026 (arXiv:2604.22012); Rustamkulov et al. 2026 (arXiv:2607.00543); Hui et al. 2026 (arXiv:2602.09139); Li et al. 2016 (arXiv:1601.00117); Holl et al. 2023 (A&A, doi:10.1051/0004-6361/202245353); Binnenfeld et al. 2026 (arXiv:2611.08282); VanderPlas & Ivezić 2015 (arXiv:1502.01344); Schlanger et al. 2026 (arXiv:2607.18054); Meisner et al. 2022 (arXiv:2209.14327); Luhman 2014 (ApJL 786, L18).
-- Software (open source): Astropy, NumPy, SciPy, pandas, Matplotlib, fsspec, aiohttp, Pillow. All code in the repository was written for this project (SI-generated under the team's direction, disclosed in every file); no third-party code was copied beyond the open-source libraries listed. No copyrighted images or music are used.
+**Space Agency Partner data**
+- **ESA Gaia DR3** astrometry, used indirectly through SIMBAD for target positions and proper motions: https://www.cosmos.esa.int/web/gaia/dr3
+
+**Other data**
+- **SIMBAD** (CDS, Strasbourg), coordinates, proper motions and parallaxes of WISE 0855 and the challenge targets, via the Sesame name resolver: https://simbad.cds.unistra.fr/ (mirror used: https://vizier.idia.ac.za/viz-bin/nph-sesame)
+- **VizieR** (CDS) catalogs for the blended-star check: AAVSO VSX (B/vsx) https://www.aavso.org/vsx/ and Gaia DR3 variability classification (I/358) https://vizier.cds.unistra.fr/
+
+**Literature** (all open access)
+- Bock et al. 2025, *The SPHEREx Satellite Mission*: https://arxiv.org/abs/2511.02985
+- Akeson et al. 2025, *The SPHEREx Image and Spectrophotometry Processing Pipeline*: https://arxiv.org/abs/2511.15823
+- Saydjari et al. 2026, *Forward modeling linear variable filter data*: https://arxiv.org/abs/2611.12846
+- Gagné et al. 2026, *A SPHEREx Pipeline and Spectral Library for Ultracool Dwarfs*: https://arxiv.org/abs/2604.22012
+- Rustamkulov et al. 2026, *SPHEREx Spectra for a Sequence of Nearby Brown Dwarfs*: https://arxiv.org/abs/2607.00543
+- Hui et al. 2026, *Spectral response of SPHEREx*: https://arxiv.org/abs/2602.09139
+- Li et al. 2016, *Systematic Chromatic Errors*: https://arxiv.org/abs/1601.00117
+- Holl et al. 2023, *Gaia DR3: scan-angle-dependent signals and spurious periods*: https://doi.org/10.1051/0004-6361/202245353
+- Binnenfeld et al. 2026, *Mitigating scanning-induced systematics in Hipparcos*: https://arxiv.org/abs/2611.08282
+- VanderPlas & Ivezić 2015, *Periodograms for Multiband Astronomical Time Series*: https://arxiv.org/abs/1502.01344
+- Schlanger et al. 2026, *Co-addition and Subtraction of Undersampled Images*: https://arxiv.org/abs/2607.18054
+- Meisner et al. 2022, *unTimely*: https://arxiv.org/abs/2209.14327
+- Luhman 2014, discovery of WISE 0855−0714 (ApJL 786, L18): https://doi.org/10.1088/2041-8205/786/2/L18
+- Literature search tools: arXiv API https://arxiv.org/help/api and OpenAlex https://openalex.org/
+
+**Software and tools** (open source unless noted)
+- Astropy https://www.astropy.org · NumPy https://numpy.org · SciPy https://scipy.org · pandas https://pandas.pydata.org · Matplotlib https://matplotlib.org · fsspec https://filesystem-spec.readthedocs.io · aiohttp https://docs.aiohttp.org · Pillow https://python-pillow.org · FFmpeg https://ffmpeg.org
+- GitHub and GitHub Pages hosting: https://github.com/MurphyJUAN/spectral-aware-blink
+- Claude / Claude Code (Anthropic), SI assistant, disclosed above: https://www.anthropic.com/claude-code
+- All code in the repository was written for this project (SI-generated under the team's direction, disclosed in every file); no third-party code was copied beyond the libraries listed. No copyrighted images or music are used.

@@ -5,7 +5,7 @@
 **NASA Space Apps Challenge 2026 · Challenge: *Planet X and SPHEREx* · Local Event: Taichung, Taiwan**
 Team: **Jellybit** · Member: **Yining Juan**
 
-**Live tool:** https://murphyjuan.github.io/spectral-aware-blink/web/ · **Demo slides:** [`demo/Spectral-Aware-Blink-slides.pdf`](demo/Spectral-Aware-Blink-slides.pdf)
+**Live tool:** https://murphyjuan.github.io/spectral-aware-blink/web/ · **Demo video (29 s):** [`demo/Spectral-Aware-Blink-30s.mp4`](https://murphyjuan.github.io/spectral-aware-blink/demo/Spectral-Aware-Blink-30s.mp4) · **Slides:** [`demo/Spectral-Aware-Blink-slides.pdf`](demo/Spectral-Aware-Blink-slides.pdf)
 
 > **Use of Super Intelligence (SI):** the idea was conceived by Yining Juan with a discussion partner (no SI); Claude (Anthropic) expanded it into a detailed implementation plan, and Claude Code generated the software, analyses, figures and text under our direction. Every source file carries an `SI-generated` header. See [SI disclosure](#use-of-super-intelligence-si).
 
@@ -76,9 +76,13 @@ python experiments/e5_coverage.py data/cov.npz 133.76 -7.2421 1.6 600 results/e5
 - Literature check covered arXiv/OpenAlex and seven full texts, not ADS full-text or the SPHEREx Explanatory Supplement.
 
 ## NASA data and resources
-- SPHEREx DR1 Level-2 spectral images (IMAGE, VARIANCE, ZODI, FLAGS, WCS-WAVE) from the public NASA/IPAC IRSA AWS mirror `s3://nasa-irsa-spherex` (`dr1/level2/`), 258 exposures covering WISE 0855−0714.
-- IRSA SPHEREx SIA metadata for WISE 0855 (saved 2025-11-14), IRSA SPHEREx documentation and tutorials.
-- NASA WISE / NEOWISE context (WiseView, Backyard Worlds) for the blink concept; target coordinates and proper motions from SIMBAD (CDS) via Sesame; 2MASS (IPAC/NASA) for one blend check.
+- **SPHEREx DR1 Level-2 Spectral Images** (NASA / Caltech-IPAC IRSA), the core input of every result. We used the IMAGE, VARIANCE, ZODI (zodiacal-light model), FLAGS and WCS-WAVE (per-pixel wavelength) extensions of 258 exposures covering WISE 0855−0714 (May 2025 – May 2026), read by HTTP range requests from the public AWS mirror.
+  - IRSA SPHEREx mission page: https://irsa.ipac.caltech.edu/Missions/spherex.html
+  - Public AWS S3 mirror: https://nasa-irsa-spherex.s3.amazonaws.com/ (prefix `dr1/level2/`)
+- **IRSA SPHEREx Simple Image Access (SIA) service**, used to list the exposures covering WISE 0855 (results saved on 2025-11-14): https://irsa.ipac.caltech.edu/SIA?COLLECTION=spherex_dr1
+- **IRSA SPHEREx tutorials and documentation** (FITS structure, flag bits, wavelength WCS): https://caltech-ipac.github.io/irsa-tutorials/spherex/
+- **2MASS All-Sky Point Source Catalog** (NASA/IPAC), used to identify a blended star: https://irsa.ipac.caltech.edu/Missions/2mass.html (accessed through the VizieR mirror, catalog II/246)
+- **NASA WISE / NEOWISE heritage**, the blink approach we extend: WiseView https://byw.tools/wiseview and Backyard Worlds: Planet 9 https://backyardworlds.org/
 
 ## Use of Super Intelligence (SI)
 The core idea of this project (removing SPHEREx's rainbow-filter flicker by subtracting a spectral model learned from the other survey passes before blinking) was conceived by Yining Juan together with a discussion partner, without SI. We then used Claude (Anthropic) to expand our idea into a detailed implementation plan, and Claude Code, an SI coding assistant, to write and debug the Python pipeline and the web tool, run and analyse the experiments, search and summarise the literature, produce the figures programmatically, and draft the documentation, slides and submission text. We reviewed the results and decided which claims to make. Every source file carries an "SI-generated" header, and the data products and web pages are labelled the same way in their metadata. No SI image, video or audio generation was used: every figure is a plot made by our code from NASA data.
