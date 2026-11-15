@@ -52,7 +52,7 @@ Yes. The core idea of this project (removing SPHEREx's rainbow-filter flicker by
 - **IRSA SPHEREx Simple Image Access (SIA) service**, used to list the exposures covering WISE 0855 (results saved on 2025-11-14): https://irsa.ipac.caltech.edu/SIA?COLLECTION=spherex_dr1
 - **IRSA SPHEREx tutorials and documentation** (FITS structure, flag bits, wavelength WCS): https://caltech-ipac.github.io/irsa-tutorials/spherex/
 - **2MASS All-Sky Point Source Catalog** (NASA/IPAC), used to identify a blended star: https://irsa.ipac.caltech.edu/Missions/2mass.html (accessed through the VizieR mirror, catalog II/246)
-- **NASA WISE / NEOWISE heritage**, the blink approach we extend: WiseView https://byw.tools/wiseview and Backyard Worlds: Planet 9 https://backyardworlds.org/
+- **NASA WISE / NEOWISE heritage**, the blink approach we extend: WiseView http://byw.tools/wiseview and Backyard Worlds: Planet 9 https://backyardworlds.org/
 
 ## Space Agency Partner Data and Other References
 **Space Agency Partner data**
