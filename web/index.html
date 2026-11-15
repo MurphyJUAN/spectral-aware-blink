@@ -172,7 +172,8 @@ function showStar(id) {
   pts.forEach(p => { const ok = fits[p.d] && p.f > 0; p.rel = ok ? p.f / med[p.d] : NaN; p.res = ok ? p.f / p.m : NaN; });
   const sd = a => { const b = a.filter(isFinite); if (b.length < 3) return NaN; const m = median(b); return 1.4826 * median(b.map(x => Math.abs(x - m))); };  // robust rms (MAD)
   const lcPts = pts.filter(p => isFinite(p.rel));
-  plot("lc", lcPts.length ? lcPts : pts, p => p.t - D.mjd[0], p => p.rel, "days since first exposure", "relative flux",
+  if (!lcPts.length) { document.getElementById("lc").innerHTML = `<text class="ttl" x="52" y="40">This star is too faint (S/N &lt; 5 per exposure) for a per-exposure light curve.</text><text x="52" y="62">Pick a brighter star (larger dot in the naive stack).</text>`; }
+  else plot("lc", lcPts, p => p.t - D.mjd[0], p => p.rel, "days since first exposure", "relative flux",
        `Relative flux vs TIME — naive (dots, robust rms ${(100 * sd(pts.map(p => p.rel))).toFixed(1)}%) vs ÷ spectral model (rings, rms ${(100 * sd(pts.map(p => p.res))).toFixed(1)}%)`, false, null, p => p.res);
   // R2/R3 warning: predicted lambda-blind false variability from metadata
   let rows = "";
@@ -190,7 +191,7 @@ function showStar(id) {
   }
   const skipNote = skipped.length ? `<br><span class="cap">Detectors ${skipped.map(d => "D" + d).join(", ")}: too faint for a reliable spectral fit (median S/N &lt; 5) — not shown.</span>` : "";
   document.getElementById("warn").innerHTML = `<div class="warn"><b>Predicted false blink amplitude (from metadata, rules R2/R3)</b>${skipNote}<br>
-  <table><tr><th>det</th><th>β</th><th>β−β_field</th><th>λ-blind stack</th><th>after zero-point</th></tr>${rows}</table>
+  ${rows ? `<table><tr><th>det</th><th>β</th><th>β−β_field</th><th>λ-blind stack</th><th>after zero-point</th></tr>${rows}</table>` : ""}
   Values above ~3% exceed the spectral-model floor: compare passes only through the spectral residual for this star.</div>`;
 }
 function plot(id, pts, fx, fy, xl, yl, title, isSpec, fits, fy2) {
