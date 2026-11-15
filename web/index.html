@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spectral-Aware Blink — SPHEREx</title>
+<meta name="generator" content="SI-assisted: written with Claude Code (Anthropic) under the direction of the team, NASA Space Apps 2026">
+<style>
+.viz-root{color-scheme:light;--surface-1:#fcfcfb;--surface-2:#f1f0ec;--text-primary:#0b0b0b;--text-secondary:#52514e;--grid:#e4e3df;
+  --s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#52514e;--accent:#eb6834}
+@media (prefers-color-scheme: dark){:root:where(:not([data-theme="light"])) .viz-root{color-scheme:dark;--surface-1:#1a1a19;--surface-2:#262624;
+  --text-primary:#f0efec;--text-secondary:#c3c2b7;--grid:#3a3a37;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#a9a89f;--accent:#d95926}}
+body{margin:0;font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+.viz-root{background:var(--surface-1);color:var(--text-primary);min-height:100vh;padding:14px 18px;box-sizing:border-box}
+h1{font-size:18px;margin:0 0 2px} .sub{color:var(--text-secondary);font-size:12.5px;margin-bottom:10px}
+.bar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:8px 0 12px}
+.seg{display:inline-flex;border:1px solid var(--grid);border-radius:8px;overflow:hidden}
+.seg button{background:var(--surface-1);color:var(--text-primary);border:0;padding:5px 10px;font:inherit;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface-2);font-weight:600}
+.lbl{color:var(--text-secondary);font-size:12px;margin-right:4px}
+.main{display:grid;grid-template-columns:minmax(300px,440px) 1fr;gap:18px}
+@media (max-width:900px){.main{grid-template-columns:1fr}}
+.card{background:var(--surface-1);border:1px solid var(--grid);border-radius:10px;padding:10px}
+canvas{width:100%;image-rendering:pixelated;border-radius:6px;cursor:crosshair;display:block}
+.cap{font-size:12px;color:var(--text-secondary);margin-top:6px}
+svg text{fill:var(--text-secondary);font-size:11px} svg .ttl{fill:var(--text-primary);font-size:12.5px;font-weight:600}
+.legend{display:flex;gap:12px;font-size:12px;color:var(--text-secondary);flex-wrap:wrap;margin:2px 0 4px}
+.legend span{display:inline-flex;align-items:center;gap:5px} .sw{width:10px;height:10px;border-radius:50%;display:inline-block}
+.warn{border-left:3px solid var(--accent);padding:6px 10px;background:var(--surface-2);border-radius:4px;font-size:12.5px;margin-top:8px}
+#tip{position:fixed;pointer-events:none;background:var(--surface-2);color:var(--text-primary);border:1px solid var(--grid);border-radius:6px;padding:4px 8px;font-size:12px;display:none;z-index:9}
+table{border-collapse:collapse;font-size:12px} td,th{padding:2px 8px;text-align:right;border-bottom:1px solid var(--grid)}
+</style>
+</head>
+<body>
+<div class="viz-root">
+  <h1>Spectral-Aware Blink — SPHEREx DR1</h1>
+  <div class="sub" id="sub">loading…</div>
+  <div class="bar">
+    <span><span class="lbl">mode</span><span class="seg" id="mode">
+      <button data-v="raw">naive stack</button><button data-v="B2_detstack">B2 λ-blind residual</button>
+      <button data-v="B1_samecolor">B1 same-colour</button><button data-v="C_spectral">C spectral (ours)</button></span></span>
+    <span><span class="lbl">detectors</span><span class="seg" id="grp"><button data-v="D123">D1–D3 (0.75–2.4 µm)</button><button data-v="D456">D4–D6 (2.4–5 µm)</button></span></span>
+    <span><span class="lbl">pass</span><span class="seg" id="pass"></span></span>
+    <span class="seg"><button id="play">▶ blink</button></span>
+    <span><span class="lbl">field</span><select id="field" style="font:inherit;padding:4px;border-radius:6px;border:1px solid var(--grid);background:var(--surface-1);color:var(--text-primary)">
+      <option value="data/w0855.json">W — WISE 0855 (centre)</option><option value="data/fA.json">A (+1° RA)</option>
+      <option value="data/fB.json">B (−1° RA)</option><option value="data/fC.json">C (−1° Dec)</option></select></span>
+  </div>
+  <div class="main">
+    <div class="card">
+      <canvas id="cv" width="440" height="440" aria-label="per-pass image"></canvas>
+      <div class="cap" id="cap"></div>
+      <div class="cap">Click a star to see its spectrum and light curve. Orange circle: WISE 0855 predicted position for the shown pass (field W only). Residual colour: blue −5σ … grey 0 … orange +5σ.</div>
+    </div>
+    <div class="card">
+      <div id="info" class="cap">Select a star.</div>
+      <div class="legend" id="leg"></div>
+      <svg id="spec" width="100%" height="250" role="img" aria-label="spectrum"></svg>
+      <svg id="lc" width="100%" height="250" role="img" aria-label="light curve"></svg>
+      <div id="warn"></div>
+    </div>
+  </div>
+</div>
+<div class="cap" style="margin-top:14px">Data: NASA SPHEREx DR1 (IRSA, AWS mirror). Code and this page were written with an SI assistant (Claude Code) under team direction. <a href="https://github.com/MurphyJUAN/spectral-aware-blink" style="color:inherit">Source &amp; findings</a></div>
+<div id="tip"></div>
+<script>
+const Q = new URLSearchParams(location.search);
+const S = {mode: Q.get("mode") || "C_spectral", grp: Q.get("grp") || "D456", pass: +(Q.get("pass") || 0), star: Q.get("star"), timer: null};
+const CS = () => getComputedStyle(document.querySelector(".viz-root"));
+const PASSC = () => ["--s1", "--s2", "--s3", "--s4"].map(v => CS().getPropertyValue(v).trim());
+const MARK = ["circle", "square", "triangle", "diamond"];
+let D;
+const DATA = Q.get("data") || "data/w0855.json";
+fetch(DATA).then(r => r.json()).then(d => { D = d; init(); });
+document.getElementById("field").value = DATA;
+document.getElementById("field").onchange = ev => { const u = new URLSearchParams(location.search); u.set("data", ev.target.value); u.delete("star"); location.search = u.toString(); };
+
+function seg(id, key, vals) {
+  const el = document.getElementById(id);
+  if (vals) el.innerHTML = vals.map(v => `<button data-v="${v[0]}">${v[1]}</button>`).join("");
+  el.querySelectorAll("button").forEach(b => {
+    b.onclick = () => { S[key] = isNaN(+b.dataset.v) ? b.dataset.v : +b.dataset.v; sync(); };
+  });
+}
+function sync() {
+  for (const [id, key] of [["mode", "mode"], ["grp", "grp"], ["pass", "pass"]])
+    document.querySelectorAll(`#${id} button`).forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v == S[key])));
+  const u = new URLSearchParams({data: DATA, mode: S.mode, grp: S.grp, pass: S.pass}); if (S.star != null) u.set("star", S.star);
+  history.replaceState(null, "", "?" + u.toString());
+  draw(); if (S.star != null) showStar(+S.star);
+}
+function init() {
+  document.getElementById("sub").textContent = `${D.name} · centre RA ${D.ra0.toFixed(4)}, Dec ${D.dec0.toFixed(4)} · ${D.n}×${D.n} px (${(D.n * D.pix_arcsec / 60).toFixed(1)}′) · ${D.mjd.length} exposures in ${D.pass_dates.length} passes · ${D.stars.length} stars`;
+  seg("mode", "mode"); seg("grp", "grp"); seg("pass", "pass", D.pass_dates.map((d, i) => [i, `${i + 1} · ${d}`]));
+  document.getElementById("play").onclick = () => {
+    if (S.timer) { clearInterval(S.timer); S.timer = null; document.getElementById("play").textContent = "▶ blink"; }
+    else { S.timer = setInterval(() => { S.pass = (S.pass + 1) % D.pass_dates.length; sync(); }, 700); document.getElementById("play").textContent = "❚❚ stop"; }
+  };
+  const cv = document.getElementById("cv");
+  cv.onclick = ev => {
+    const r = cv.getBoundingClientRect(), x = (ev.clientX - r.left) / r.width * D.n, y = (1 - (ev.clientY - r.top) / r.height) * D.n;
+    let best = null, bd = 4;
+    D.stars.forEach(s => { const dd = Math.hypot(s.x - x, s.y - y); if (dd < bd) { bd = dd; best = s.id; } });
+    if (best != null) { S.star = best; sync(); }
+  };
+  sync();
+}
+function cmapDiv(z) { // blue - grey - orange, z in sigma
+  const t = Math.max(-1, Math.min(1, z / 5));
+  const g = [232, 231, 227], b = [28, 92, 171], o = [184, 70, 27];
+  const e = t < 0 ? b : o, a = Math.abs(t);
+  return g.map((c, i) => Math.round(c + (e[i] - c) * a));
+}
+function draw() {
+  const key = S.mode === "raw" ? `raw|${S.grp}` : `${S.mode}|${S.grp}`;
+  const arr = D.img[key][S.pass].flat(), n = D.n, cv = document.getElementById("cv"), ctx = cv.getContext("2d");
+  const im = ctx.createImageData(n, n);
+  let vmax = 1;
+  if (S.mode === "raw") { const v = D.img[key].flat(2).map(x => x / D.scale.raw).sort((a, b) => a - b); vmax = v[Math.floor(v.length * 0.995)] || 1; }
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+    const v = arr[y * n + x], o = ((n - 1 - y) * n + x) * 4;
+    let c;
+    if (S.mode === "raw") { const t = Math.asinh(v / D.scale.raw / (0.05 * vmax)) / Math.asinh(20); const g = Math.round(255 * Math.max(0, Math.min(1, t))); c = [g, g, g]; }
+    else c = cmapDiv(v / D.scale.Z);
+    im.data[o] = c[0]; im.data[o + 1] = c[1]; im.data[o + 2] = c[2]; im.data[o + 3] = 255;
+  }
+  const off = new OffscreenCanvas(n, n); off.getContext("2d").putImageData(im, 0, 0);
+  ctx.imageSmoothingEnabled = false; ctx.drawImage(off, 0, 0, cv.width, cv.height);
+  const sc = cv.width / n, m = D.mover.xy[S.pass];
+  ctx.strokeStyle = CS().getPropertyValue("--accent"); ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc((m[0] + 0.5) * sc, (n - m[1] - 0.5) * sc, 3.2 * sc, 0, 7); ctx.stroke();
+  if (S.star != null) { const s = D.stars.find(s => s.id == S.star); if (s) { ctx.strokeStyle = CS().getPropertyValue("--text-primary"); ctx.lineWidth = 1.5;
+    ctx.strokeRect((s.x - 2) * sc, (n - s.y - 3) * sc, 5 * sc, 5 * sc); } }
+  const names = {raw: "naive per-pass stack (what a blink shows)", B2_detstack: "B2: pass stack − other passes (λ-blind)", B1_samecolor: "B1: same-colour pairs only", C_spectral: "C: data − LOPO spectral model"};
+  document.getElementById("cap").textContent = `Pass ${S.pass + 1} (${D.pass_dates[S.pass]}) · ${S.grp} · ${names[S.mode]}`;
+}
+// ---- per-detector power-law SED fit (R4: ~linear in ln λ at 3%) ----
+function fitPL(L, F, E) { // weighted quadratic in ln(lambda) for ln F (3 params / detector); b = local slope at mean ln(lambda)
+  const A = [[0,0,0],[0,0,0],[0,0,0]], r = [0,0,0]; let mx = 0, sw = 0;
+  for (let i = 0; i < L.length; i++) if (F[i] > 0) { const w = (F[i] / E[i]) ** 2; mx += w * Math.log(L[i]); sw += w; }
+  mx /= sw;
+  for (let i = 0; i < L.length; i++) { if (!(F[i] > 0)) continue; const w = (F[i] / E[i]) ** 2, x = Math.log(L[i]) - mx, y = Math.log(F[i]), v = [1, x, x * x];
+    for (let a = 0; a < 3; a++) { r[a] += w * v[a] * y; for (let b = 0; b < 3; b++) A[a][b] += w * v[a] * v[b]; } }
+  A[2][2] += 1e-6 * A[0][0];
+  const c = solve3(A, r); return {c, mx, a: c[0] - c[1] * mx, b: c[1]};
+}
+function solve3(A, r) { const M = A.map((row, i) => [...row, r[i]]);
+  for (let i = 0; i < 3; i++) { let p = i; for (let k = i + 1; k < 3; k++) if (Math.abs(M[k][i]) > Math.abs(M[p][i])) p = k; [M[i], M[p]] = [M[p], M[i]];
+    for (let k = i + 1; k < 3; k++) { const f = M[k][i] / M[i][i]; for (let j = i; j < 4; j++) M[k][j] -= f * M[i][j]; } }
+  const x = [0, 0, 0]; for (let i = 2; i >= 0; i--) { let s = M[i][3]; for (let j = i + 1; j < 3; j++) s -= M[i][j] * x[j]; x[i] = s / M[i][i]; } return x; }
+function evalPL(ft, l) { const x = Math.log(l) - ft.mx; return Math.exp(ft.c[0] + ft.c[1] * x + ft.c[2] * x * x); }
+function showStar(id) {
+  const s = D.stars.find(s => s.id == id); if (!s) return;
+  const pts = [];
+  s.f.forEach((f, i) => { if (f != null && s.l[i] != null) pts.push({f, e: s.e[i], l: s.l[i], t: D.mjd[i], d: D.det[i], p: D.pas[i]}); });
+  const fits = {}, betaField = {1: 0.54, 2: 0.19, 3: -1.25, 4: -1.63, 5: -1.89, 6: -1.32};
+  for (let d = 1; d <= 6; d++) { const q = pts.filter(p => p.d === d); if (q.length >= 6) fits[d] = fitPL(q.map(p => p.l), q.map(p => p.f), q.map(p => p.e)); }
+  pts.forEach(p => { const ft = fits[p.d]; p.m = ft ? evalPL(ft, p.l) : NaN; });
+  const C = PASSC();
+  document.getElementById("leg").innerHTML = D.pass_dates.map((d, i) => `<span><i class="sw" style="background:${C[i]}"></i>pass ${i + 1}</span>`).join("") + `<span><i class="sw" style="background:var(--text-primary);border-radius:2px;height:3px"></i>smooth SED per detector (quadratic in ln λ)</span>`;
+  document.getElementById("info").innerHTML = `<b>star #${s.id}</b> · RA ${s.ra}, Dec ${s.dec} · stack SNR ${s.snr} · ${pts.length} measurements`;
+  plot("spec", pts, p => p.l, p => p.f, "wavelength at star [µm]", "flux", "Flux vs WAVELENGTH — smooth spectrum", true, fits);
+  const med = {}; for (let d = 1; d <= 6; d++) { const q = pts.filter(p => p.d === d).map(p => p.f); if (q.length) med[d] = median(q); }
+  pts.forEach(p => { p.rel = p.f / med[p.d]; p.res = p.f / p.m; });
+  const sd = a => { const b = a.filter(isFinite), mu = b.reduce((x, y) => x + y, 0) / b.length; return Math.sqrt(b.reduce((x, y) => x + (y - mu) ** 2, 0) / b.length); };
+  plot("lc", pts, p => p.t - D.mjd[0], p => p.rel, "days since first exposure", "relative flux",
+       `Relative flux vs TIME — naive (dots, rms ${(100 * sd(pts.map(p => p.rel))).toFixed(1)}%) vs ÷ spectral model (rings, rms ${(100 * sd(pts.map(p => p.res))).toFixed(1)}%)`, false, null, p => p.res);
+  // R2/R3 warning: predicted lambda-blind false variability from metadata
+  let rows = "";
+  for (let d = 1; d <= 6; d++) {
+    if (!fits[d]) continue;
+    const q = pts.filter(p => p.d === d), mu = q.reduce((a, p) => a + Math.log(p.l), 0) / q.length;
+    let worst = 0;
+    for (let k = 0; k < D.pass_dates.length; k++) { const qk = q.filter(p => p.p === k); if (qk.length < 2) continue;
+      const muk = qk.reduce((a, p) => a + Math.log(p.l), 0) / qk.length;
+      worst = Math.max(worst, Math.abs(fits[d].b * (muk - mu)), 0); }
+    let worstRel = 0;
+    for (let k = 0; k < D.pass_dates.length; k++) { const qk = q.filter(p => p.p === k); if (qk.length < 2) continue;
+      const muk = qk.reduce((a, p) => a + Math.log(p.l), 0) / qk.length; worstRel = Math.max(worstRel, Math.abs((fits[d].b - betaField[d]) * (muk - mu))); }
+    rows += `<tr><td>D${d}</td><td>${fits[d].b.toFixed(2)}</td><td>${(fits[d].b - betaField[d]).toFixed(2)}</td><td>${(100 * worst).toFixed(1)}%</td><td>${(100 * worstRel).toFixed(1)}%</td></tr>`;
+  }
+  document.getElementById("warn").innerHTML = `<div class="warn"><b>Predicted false blink amplitude (from metadata, rules R2/R3)</b><br>
+  <table><tr><th>det</th><th>β</th><th>β−β_field</th><th>λ-blind stack</th><th>after zero-point</th></tr>${rows}</table>
+  Values above ~3% exceed the spectral-model floor: compare passes only through the spectral residual for this star.</div>`;
+}
+function plot(id, pts, fx, fy, xl, yl, title, isSpec, fits, fy2) {
+  const svg = document.getElementById(id), W = svg.clientWidth || 600, H = 250, m = {l: 52, r: 12, t: 22, b: 36};
+  const xs = pts.map(fx), ys = pts.map(fy).concat(fy2 ? pts.map(fy2) : []);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys.filter(isFinite)), y1 = Math.max(...ys.filter(isFinite));
+  const X = v => m.l + (v - x0) / (x1 - x0 || 1) * (W - m.l - m.r), Y = v => H - m.b - (v - y0) / (y1 - y0 || 1) * (H - m.t - m.b);
+  const C = PASSC(); let g = `<text class="ttl" x="${m.l}" y="14">${title}</text>`;
+  for (let i = 0; i <= 4; i++) { const yv = y0 + (y1 - y0) * i / 4, xv = x0 + (x1 - x0) * i / 4;
+    g += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(yv)}" y2="${Y(yv)}" stroke="var(--grid)"/><text x="${m.l - 6}" y="${Y(yv) + 4}" text-anchor="end">${yv.toPrecision(3)}</text>
+          <text x="${X(xv)}" y="${H - m.b + 15}" text-anchor="middle">${xv.toPrecision(3)}</text>`; }
+  g += `<text x="${(m.l + W - m.r) / 2}" y="${H - 4}" text-anchor="middle">${xl}</text>`;
+  if (isSpec && fits) for (const d in fits) { const q = pts.filter(p => p.d == d).map(p => p.l).sort((a, b) => a - b); if (q.length < 2) continue;
+    let path = ""; for (let i = 0; i <= 30; i++) { const l = q[0] + (q[q.length - 1] - q[0]) * i / 30; path += (i ? "L" : "M") + X(l) + "," + Y(evalPL(fits[d], l)); }
+    g += `<path d="${path}" fill="none" stroke="var(--text-primary)" stroke-width="2"/>`; }
+  pts.forEach((p, i) => { const c = C[p.p % 4], x = X(fx(p)), y = Y(fy(p));
+    g += `<circle cx="${x}" cy="${y}" r="4" fill="${c}" stroke="var(--surface-1)" stroke-width="1" data-i="${i}"><title>pass ${p.p + 1} · D${p.d} · λ=${p.l.toFixed(3)} µm · F=${p.f.toFixed(2)}±${p.e.toFixed(2)}</title></circle>`;
+    if (fy2 && isFinite(fy2(p))) g += `<circle cx="${x + 3}" cy="${Y(fy2(p))}" r="4" fill="none" stroke="${c}" stroke-width="1.5"/>`; });
+  svg.innerHTML = g;
+}
+function median(a) { const b = a.filter(isFinite).sort((x, y) => x - y); return b[Math.floor(b.length / 2)]; }
+window.addEventListener("resize", () => { if (D && S.star != null) showStar(+S.star); });
+</script>
+</body>
+</html>
