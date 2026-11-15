@@ -1,6 +1,5 @@
 # Space Apps 2026 — project page text (copy-paste)
 
-> Replace `[TEAM NAME]` / `[MEMBERS]` everywhere (also in `demo/slides.html` → re-export PDF, and README).
 
 ---
 
@@ -41,10 +40,10 @@ https://github.com/MurphyJUAN/spectral-aware-blink
 
 **What we hope to achieve.** An all-sky, spectrum-aware blink service for SPHEREx in the spirit of WiseView and Backyard Worlds, a vetted candidate list of nearby cold movers cross-matched with Gaia/CatWISE, and a contribution of the relative-colour correction to SPHEREx time-domain science.
 
-**Tools.** Python (Astropy, NumPy, SciPy, pandas, Matplotlib, fsspec/aiohttp, Pillow); vanilla HTML/JavaScript/Canvas/SVG for the web tool; GitHub Pages hosting; a cloud GPU node used only as a fast network/CPU worker. An SI coding assistant (Claude Code) was used under team direction (see the SI section).
+**Tools.** Python (Astropy, NumPy, SciPy, pandas, Matplotlib, fsspec/aiohttp, Pillow); vanilla HTML/JavaScript/Canvas/SVG for the web tool; GitHub Pages hosting; a cloud GPU node used only as a fast network/CPU worker. SI tools (Claude for implementation planning, Claude Code for code, analysis and drafting) were used on top of the team's own idea (see the SI section).
 
 ## Use of Super Intelligence (SI)
-Yes. The project concept (spectral-model differencing for SPHEREx blink, validated by injection-recovery against baselines) was defined by the team before using SI. We used Claude Code (Anthropic), an SI coding assistant, to write and debug the Python pipeline and the web tool, run and analyse experiments, search and summarise literature, generate figures programmatically, and draft documentation and slides. All source files carry an "SI-assisted" header, and the README, web page metadata and slides disclose SI use. No SI image or video generation models were used; all figures are plots produced by our code from NASA data. The team reviewed the results and decided which claims to make.
+Yes. The core idea of this project (removing SPHEREx's rainbow-filter flicker by subtracting a spectral model learned from the other survey passes before blinking) came from a discussion between our team members. We then used Claude (Anthropic) to expand our idea into a detailed implementation plan, and Claude Code, an SI coding assistant, to write and debug the Python pipeline and the web tool, run and analyse the experiments, search and summarise the literature, produce the figures programmatically, and draft the documentation, slides and submission text. We reviewed the results and decided which claims to make. Every source file carries an "SI-generated" header, and the data products and web pages are labelled the same way in their metadata. No SI image, video or audio generation was used: every figure is a plot made by our code from NASA data.
 
 ## NASA Data
 - **SPHEREx DR1 Level-2 spectral images** (NASA/IPAC Infrared Science Archive), read from the public AWS mirror `s3://nasa-irsa-spherex/dr1/level2/`: IMAGE, VARIANCE, ZODI (zodiacal-light model), FLAGS and WCS-WAVE (per-pixel wavelength) extensions of 258 exposures covering WISE 0855−0714 (May 2025 – May 2026). These are the core input of every result.
@@ -55,4 +54,4 @@ Yes. The project concept (spectral-model differencing for SPHEREx blink, validat
 ## Space Agency Partner Data and Other References
 - Target coordinates and proper motions: SIMBAD (CDS, Strasbourg) via Sesame; ESA Gaia DR3 values as compiled in SIMBAD.
 - Literature: Bock et al. 2025, The SPHEREx Satellite Mission (arXiv:2511.02985); Akeson et al. 2025, SPHEREx pipeline (arXiv:2511.15823); Saydjari et al. 2026, Forward modeling LVF data (arXiv:2611.12846); Gagné et al. 2026 (arXiv:2604.22012); Rustamkulov et al. 2026 (arXiv:2607.00543); Hui et al. 2026 (arXiv:2602.09139); Li et al. 2016 (arXiv:1601.00117); Holl et al. 2023 (A&A, doi:10.1051/0004-6361/202245353); Binnenfeld et al. 2026 (arXiv:2611.08282); VanderPlas & Ivezić 2015 (arXiv:1502.01344); Schlanger et al. 2026 (arXiv:2607.18054); Meisner et al. 2022 (arXiv:2209.14327); Luhman 2014 (ApJL 786, L18).
-- Software (open source): Astropy, NumPy, SciPy, pandas, Matplotlib, fsspec, aiohttp, Pillow. All code in the repository is our own (SI-assisted, disclosed). No copyrighted images or music are used.
+- Software (open source): Astropy, NumPy, SciPy, pandas, Matplotlib, fsspec, aiohttp, Pillow. All code in the repository was written for this project (SI-generated under the team's direction, disclosed in every file); no third-party code was copied beyond the open-source libraries listed. No copyrighted images or music are used.

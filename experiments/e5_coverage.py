@@ -1,4 +1,4 @@
-# SI-assisted: written with Claude Code (Anthropic) under the direction of the team, NASA Space Apps 2026.
+# SI-generated code: written with Claude Code (Anthropic) from the team's idea and under the team's direction, NASA Space Apps 2026.
 """E5: survey-geometry rules over many sky positions (header-only, no pixels).
 For random positions inside the SIA footprint: within-pass time<->lambda aliasing, same-colour pairing
 usability f(tau) vs a Poisson prediction, B2 effective-wavelength mismatch, predicted SNR gain C vs B1.

@@ -1,4 +1,4 @@
-# SI-assisted: written with Claude Code (Anthropic) under the direction of the team, NASA Space Apps 2026.
+# SI-generated code: written with Claude Code (Anthropic) from the team's idea and under the team's direction, NASA Space Apps 2026.
 """E8: predicted false variability of a lambda-blind detector stack (after per-image zero-point matching to the
 field-star population) for different SED classes, over many sky positions, using real SPHEREx wavelength sampling.
 FV_T(k) = ln(<s_T(lam)>_k / <s_T(lam)>_all) - ln(<s_field(lam)>_k / <s_field(lam)>_all)

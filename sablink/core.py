@@ -1,4 +1,4 @@
-# SI-assisted: written with Claude Code (Anthropic) under the direction of the team, NASA Space Apps 2026.
+# SI-generated code: written with Claude Code (Anthropic) from the team's idea and under the team's direction, NASA Space Apps 2026.
 """Core: load cutouts, preprocess, reproject to a common grid, per-pixel spectral models (LOPO)."""
 import glob
 import logging

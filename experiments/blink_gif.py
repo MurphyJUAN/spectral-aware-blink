@@ -1,4 +1,4 @@
-# SI-assisted: written with Claude Code (Anthropic) under the direction of the team, NASA Space Apps 2026.
+# SI-generated code: written with Claude Code (Anthropic) from the team's idea and under the team's direction, NASA Space Apps 2026.
 """Demo GIF: per-pass blink of raw stacks vs residual SNR maps (B2, C) around WISE 0855 in D5+D6.
 Usage: python blink_gif.py <cache_dir> <ra0> <dec0> <grid_n> <out_gif>
 """

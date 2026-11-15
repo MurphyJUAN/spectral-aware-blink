@@ -1,4 +1,4 @@
-# SI-assisted: written with Claude Code (Anthropic) under the direction of the team, NASA Space Apps 2026.
+# SI-generated code: written with Claude Code (Anthropic) from the team's idea and under the team's direction, NASA Space Apps 2026.
 """E7: source-level variability injection-recovery on REAL stationary-star photometry.
 For each (star, detector, pass k): multiply pass-k fluxes by (1+A) and test whether the pass-k brightening is
 detected at equal false-alarm probability (thresholds from the un-injected statistic distribution).

@@ -1,4 +1,4 @@
-# SI-assisted: written with Claude Code (Anthropic) under the direction of the team, NASA Space Apps 2026.
+# SI-generated code: written with Claude Code (Anthropic) from the team's idea and under the team's direction, NASA Space Apps 2026.
 """E1: residual cleanliness of stationary sky (chi2_nu by pixel class) for B0/B1/B2/C, eta calibration,
 false-positive rate in per-pass SNR maps.
 Usage: python e1_residuals.py <cache_dir> <ra0> <dec0> <grid_n> <outdir>

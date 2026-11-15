@@ -1,4 +1,4 @@
-# SI-assisted: written with Claude Code (Anthropic) under the direction of the team, NASA Space Apps 2026.
+# SI-generated code: written with Claude Code (Anthropic) from the team's idea and under the team's direction, NASA Space Apps 2026.
 """E3: injection-recovery of moving point sources. Same preprocessing + same detector for all methods;
 thresholds set per method from the null (no-injection) maps at equal false-alarm probability.
 Usage: python e3_inject.py <cache_dir> <ra0> <dec0> <grid_n> <outdir> <n_real> [seed] [n_src]

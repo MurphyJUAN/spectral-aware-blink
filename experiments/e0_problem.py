@@ -1,4 +1,4 @@
-# SI-assisted: written with Claude Code (Anthropic) under the direction of the team, NASA Space Apps 2026.
+# SI-generated code: written with Claude Code (Anthropic) from the team's idea and under the team's direction, NASA Space Apps 2026.
 """E0: is per-frame flux variation of stationary stars explained by wavelength (LVF) rather than time?
 Also: within-pass time<->wavelength aliasing at fixed sky position.
 Usage: python e0_problem.py <cache_dir> <ra0> <dec0> <grid_n> <outdir>

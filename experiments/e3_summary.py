@@ -1,4 +1,4 @@
-# SI-assisted: written with Claude Code (Anthropic) under the direction of the team, NASA Space Apps 2026.
+# SI-generated code: written with Claude Code (Anthropic) from the team's idea and under the team's direction, NASA Space Apps 2026.
 """Aggregate E3 runs: completeness at equal false-alarm probability; flux at 50% completeness per method.
 Usage: python e3_summary.py <e3_dir> [fap=0.01] [min_pm=1.0]
 """

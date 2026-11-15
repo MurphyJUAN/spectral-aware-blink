@@ -3,11 +3,11 @@
 ### Telling *real* motion and variability apart from the rainbow filter in NASA's SPHEREx images
 
 **NASA Space Apps Challenge 2026 · Challenge: *Planet X and SPHEREx* · Local Event: Taichung, Taiwan**
-Team: `[TEAM NAME]` · Members: `[MEMBERS]`
+Team: **Jellybit** · Members: **Yining Juan, Richard Chen**
 
 **Live tool:** https://murphyjuan.github.io/spectral-aware-blink/web/ · **Demo slides:** [`demo/Spectral-Aware-Blink-slides.pdf`](demo/Spectral-Aware-Blink-slides.pdf)
 
-> **Use of Super Intelligence (SI):** the software, analyses, figures and text in this repository were produced with the help of an SI coding assistant (Claude Code, Anthropic), directed and reviewed by the team. Every source file carries an `SI-assisted` header. See [SI disclosure](#use-of-super-intelligence-si).
+> **Use of Super Intelligence (SI):** the idea came from our team's discussion; Claude (Anthropic) expanded it into a detailed implementation plan, and Claude Code generated the software, analyses, figures and text under our direction. Every source file carries an `SI-generated` header. See [SI disclosure](#use-of-super-intelligence-si).
 
 ---
 
@@ -81,7 +81,7 @@ python experiments/e5_coverage.py data/cov.npz 133.76 -7.2421 1.6 600 results/e5
 - NASA WISE / NEOWISE context (WiseView, Backyard Worlds) for the blink concept; target coordinates and proper motions from SIMBAD (CDS) via Sesame; 2MASS (IPAC/NASA) for one blend check.
 
 ## Use of Super Intelligence (SI)
-The project concept (spectral-model differencing for SPHEREx blink, with injection-recovery validation) was defined by the team. An SI coding assistant (Claude Code, Anthropic) was used to write and debug the code, run and analyse experiments, search and summarise literature, generate the figures and the web tool, and draft the documentation. All code files carry an `SI-assisted` header; figures were generated programmatically by that code (no image-generation models). The team reviewed the results and decided what to claim.
+The core idea of this project (removing SPHEREx's rainbow-filter flicker by subtracting a spectral model learned from the other survey passes before blinking) came from a discussion between our team members. We then used Claude (Anthropic) to expand our idea into a detailed implementation plan, and Claude Code, an SI coding assistant, to write and debug the Python pipeline and the web tool, run and analyse the experiments, search and summarise the literature, produce the figures programmatically, and draft the documentation, slides and submission text. We reviewed the results and decided which claims to make. Every source file carries an "SI-generated" header, and the data products and web pages are labelled the same way in their metadata. No SI image, video or audio generation was used: every figure is a plot made by our code from NASA data.
 
 ## References
 Bock et al. 2025 (arXiv:2511.02985) · Akeson et al. 2025 (arXiv:2511.15823) · Saydjari et al. 2026 (arXiv:2611.12846) · Gagné et al. 2026 (arXiv:2604.22012) · Rustamkulov et al. 2026 (arXiv:2607.00543) · Hui et al. 2026 (arXiv:2602.09139) · Li et al. 2016 (arXiv:1601.00117) · Holl et al. 2023 (A&A, doi:10.1051/0004-6361/202245353) · Binnenfeld et al. 2026 (arXiv:2611.08282) · VanderPlas & Ivezić 2015 (arXiv:1502.01344) · Schlanger et al. 2026 (arXiv:2607.18054) · Meisner et al. 2022 (arXiv:2209.14327) · Luhman 2014 (ApJL 786, L18).

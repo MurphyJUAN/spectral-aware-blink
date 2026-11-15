@@ -1,4 +1,4 @@
-# SI-assisted: written with Claude Code (Anthropic) under the direction of the team, NASA Space Apps 2026.
+# SI-generated code: written with Claude Code (Anthropic) from the team's idea and under the team's direction, NASA Space Apps 2026.
 """Export a static data pack for the web viewer.
 Usage: python export_web.py <cache_dir> <ra0> <dec0> <grid_n> <e0_dir> <out_json> <name>
 """

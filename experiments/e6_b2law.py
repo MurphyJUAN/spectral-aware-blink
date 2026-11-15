@@ -1,4 +1,4 @@
-# SI-assisted: written with Claude Code (Anthropic) under the direction of the team, NASA Space Apps 2026.
+# SI-generated code: written with Claude Code (Anthropic) from the team's idea and under the team's direction, NASA Space Apps 2026.
 """E6: is the pass-to-pass 'variability' of detector stacks (B2) predicted by the SED x wavelength sampling?
 Observed: ln(F_k / F_all) of per-pass inverse-variance stacks of stationary stars.
 Predicted: ln(mean_{i in k} s(lam_i) / mean_all s(lam_i)) with s = spline SED fitted to ALL OTHER passes (LOPO),
